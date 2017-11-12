@@ -1,0 +1,246 @@
+
+%left \linear
+%left \scalar
+%right \pow
+
+literal
+    > \null         => @literal null
+    > \undefined    => @literal undefined
+    > \true         => @literal true
+    > \false        => @literal false
+    > \number       => @literal parseFloat $[0]
+
+e
+    splat
+        > \... e
+        
+    array
+        component
+            > expression
+            > splat
+        
+        > \[ @multiple(component, \,) \]     => new @node.ArrayExpression(elements: $[1])
+        > \[ @multiple(component, \eln) \]   => new @node.ArrayExpression(elements: $[1])
+        
+    object
+        property
+            > splat
+            > id  =>
+                new @node.Property
+                    key: $[0]
+                    value: $[0]
+                    kind: 'init'
+                
+            > id \: id  =>
+                new @node.Property
+                    key: $[0]
+                    value: $[2]
+                    kind: 'init'
+
+            > id \: id  =>
+                new @node.Property
+                    key: $[0]
+                    value: $[2]
+                    kind: 'init'
+
+            > id function  =>
+                new @node.Method
+                    id: $[0]
+                    function: $[1]
+                    kind: null
+                    
+            > \get id function =>
+                new @node.Method
+                    id: $[1]
+                    value: $[2]
+                    kind: 'get'
+            
+            > \set id function =>
+                new @node.Method
+                    id: $[1]
+                    value: $[2]
+                    kind: 'set'
+                    
+    > e \scalar e       => @binaryExpression($)
+    > e \linear e       => @binaryExpression($)
+    > e \logical e      => @binaryExpression($)
+    > e \comparison e   => @binaryExpression($)
+    > \linear e         => @unaryExpression($)
+    > \! e              => @unaryExpression($)
+    > \not e            => @unaryExpression($)
+    > \( e \)           => $[1]
+    > function          => new @node.FunctionExpression($[0])
+    > array
+    > object
+    
+    # call expression
+    > e \( @multiple(expression, \, ) \)    =>
+        new @node.CallExpression
+            callee: $[0]
+            arguments: $[2]
+    
+    # member expressions
+    > e \. id   =>
+        new @node.MemberExpression
+            object: $[0]
+            property: $[2]
+            computed: false
+    > e \[ e \]  =>
+        new @node.MemberExpression
+            object: $[0]
+            property: $[2]
+            computed: true
+
+block
+    > \{ @multiple(statement, \eln) \}              => $[1]
+    > \indent @multiple(statement, \eln) \outdent   => $[1]
+
+function
+    parameter
+        > variable
+        > variable \= e
+
+    bound
+        > \->
+        > \=>
+    
+    type
+        > \*
+        > \~
+        > \~*
+
+    params
+        > multiple(parameter, \,)
+        
+    body
+        > block => new @node.BlockStatement(statements: $[0])
+        
+    > \fn \( params \) body  =>
+        new @node.Function
+            params: $[2]
+            body: $[5]
+            async: false
+            generator: false
+            bound: null
+
+    > \fn \( params \) bound body  =>
+        new @node.Function
+            params: $[2]
+            body: $[5]
+            async: false
+            generator: false
+            bound: $[4] == "=>"
+
+    > \fn \( params \) type body  =>
+        new @node.Function
+            params: $[2]
+            body: $[5]
+            async: $[4].includes '~'
+            generator: $[4].includes '*'
+            bound: null
+
+    > \fn \( params \) bound type body  =>
+        new @node.Function
+            params: $[2]
+            body: $[6]
+            async: $[5].includes '~'
+            generator: $[5].includes '*'
+            bound: $[4] == '=>'        
+    
+statement
+    blockable-statement
+
+        blocky
+            > blockable-statement
+            > block                 => new @node.BlockStatement(statements: $[0])
+
+        for-statement
+            > \for variable \in expression blocky =>
+                new @node.ForInStatement
+                    left: $[1]
+                    right: $[3]
+                    block: $[4]
+
+
+        do-statement
+            > \do block     => new @node.BlockStatement(statements: $[1])
+
+
+        if-statement
+            > \if e blocky =>
+                new @node.IfStatement
+                    test: $[1]
+                    consequent: $[2]
+                    alternate: null
+            > \if e blocky \else blocky =>
+                new @node.IfStatement
+                    test: $[1]
+                    consequent: $[2]
+                    alternate: $[4]
+
+        try-statement
+            catch-clause
+                > \catch variable blocky =>
+                    new @node.CatchClause
+                        param: $[1]
+                        body: $[2]
+
+            > \try blocky catch-clause =>
+                new @node.TryStatement
+                    block: $[1]
+                    handler: $[2]
+                    finalizer: null
+
+            > \try blocky catch-clause \finally blocky =>
+                new @node.TryStatement
+                    block: $[1]
+                    handler: $[2]
+                    finalizer: $[4]
+
+            > \try blocky \finally blocky =>
+                new @node.TryStatement
+                    block: $[1]
+                    handler: null
+                    finalizer: $[3]
+
+        > for-statement
+        > while-statement
+        > if-statement
+        > try-statement
+        > do-statement
+    
+    declaration
+        declarator
+            id  =>
+                new @node.VariableDeclarator
+                    constant: false
+                    id: $[0]
+                    init: null
+                    
+            pattern \= e  =>
+                new @node.VariableDeclarator
+                    constant: true
+                    id: $[0]
+                    init: null
+                    
+            pattern \:= e  =>
+                new @node.VariableDeclarator
+                    constant: false
+                    id: $[0]
+                    init: null
+        
+        \def @multiple(declarator, \,)  =>
+            new @node.VariableDeclaration
+                declarations: $[1]
+        
+        \def id function =>
+            new @node.FunctionDeclaration
+                id: $[1]
+                function: $[2]
+    
+    > blockable-statement
+        
+    
+    > e =>
+        new @node.ExpressionStatement
+            expression: $[0]                            
