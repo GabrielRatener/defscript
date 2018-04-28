@@ -1,0 +1,37 @@
+{
+  "name": "defscript",
+  "version": "0.0.1",
+  "description": "TBD",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "tangler test/index.js",
+    "repl": "tangler test",
+    "build-parsers": "crane -r e lib/grammar.crane > lib/expression-parser.js && crane lib/grammar.crane > lib/module-parser.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabrielratener/defscript.git"
+  },
+  "keywords": [
+    "web",
+    "javascript",
+    "compile-to-js"
+  ],
+  "author": "Gabriel Ratener",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gabrielratener/defscript/issues"
+  },
+  "homepage": "https://github.com/gabrielratener/defscript#readme",
+  "dependencies": {
+    "estemplate": "^0.5.1",
+    "lexie": "^1.0.1"
+  },
+  "devDependencies": {
+    "chalk": "^2.3.0",
+    "livescript": "^1.5.0"
+  }
+}

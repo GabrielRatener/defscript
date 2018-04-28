@@ -1,0 +1,9 @@
+
+##test: Function expressions
+    def add = (a, b) {
+        def d = a + b
+        6 + d
+    }
+    
+    eq(add(3, 4), 7)
+    

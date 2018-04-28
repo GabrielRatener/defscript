@@ -1,25 +1,33 @@
 
 import {Queue, Stack, DropoutStack} from "./lib/collections"
 import {tokenize} from "./lib/postprocessor"
-import lexer from "./lib/lexer"
+import {parse, compile} from "./lib/"
 
 const text = `
+{
+    hello(a) {
+        def hello() {
+            nasty()
+        }
 
-# a comment
-a = 9
-b = 8
-for a in b do
-	hahaha()
-	hello do
-		yello()
-	yes()
-	hope()
-	if does() do
-		nono()
-	else
-		baba()
+        hello()
+    }
+}
 `;
+
+/*
+
+const parsing = parser("expression");
 
 for (let token of tokenize(text)) {
 	console.log(token.type, token.source.slice(...token.range));
+    try {
+        parsing.push(token);
+    } catch (e) {
+        console.log(e);
+        break;
+    }
 }
+*/
+
+console.log(compile(text, 'expression'));

@@ -1,7 +1,16 @@
-
 %left \linear
 %left \scalar
 %right \pow
+%none '(' '[' ']' ')' '.'
+
+module
+    > @multiple(statement, sep)    =>
+        new @node.Program do
+            sourceType: 'module'
+            body: $[0]
+
+identifier
+    > \id   => new @node.Identifier(name: $[0])
 
 literal
     > \null         => @literal null
@@ -9,6 +18,31 @@ literal
     > \true         => @literal true
     > \false        => @literal false
     > \number       => @literal parseFloat $[0]
+    > \string       => @literal $[0].slice 1, -1
+
+sep
+    > ','
+    > \nl
+
+member-access
+    # member expressions
+    > e \. identifier   =>
+        new @node.MemberExpression do
+            object: $[0]
+            property: $[2]
+            computed: false
+
+    > \this identifier  =>
+        new @node.MemberExpression do
+            object: new @node.ThisExpression({loc: null})
+            property: $[1]
+            computed: false
+
+    > e '[' e ']'  =>
+        new @node.MemberExpression do
+            object: $[0]
+            property: $[2]
+            computed: true
 
 e
     splat
@@ -17,88 +51,81 @@ e
     array
         component
             > expression
-            > splat
         
-        > \[ @multiple(component, \,) \]     => new @node.ArrayExpression(elements: $[1])
-        > \[ @multiple(component, \eln) \]   => new @node.ArrayExpression(elements: $[1])
-        
+        > '[' @multiple(component, sep) ']'     => new @node.ArrayExpression elements: $[1]
+    
     object
         property
-            > splat
-            > id  =>
-                new @node.Property
+            > identifier  =>
+                new @node.Property do
                     key: $[0]
                     value: $[0]
+                    method: false
+                    shorthand: true
+                    computed: false
                     kind: 'init'
                 
-            > id \: id  =>
-                new @node.Property
+            > identifier ':' e  =>
+                new @node.Property do
                     key: $[0]
                     value: $[2]
+                    method: false
+                    shorthand: false
+                    computed: false
                     kind: 'init'
 
-            > id \: id  =>
-                new @node.Property
-                    key: $[0]
-                    value: $[2]
-                    kind: 'init'
-
-            > id function  =>
-                new @node.Method
+            > identifier function  =>
+                new @node.Method do
                     id: $[0]
-                    function: $[1]
+                    definition: $[1]
                     kind: null
                     
-            > \get id function =>
-                new @node.Method
+            > \get identifier function =>
+                new @node.Method do
                     id: $[1]
-                    value: $[2]
+                    definition: $[2]
                     kind: 'get'
             
-            > \set id function =>
-                new @node.Method
+            > \set identifier function =>
+                new @node.Method do
                     id: $[1]
-                    value: $[2]
+                    definition: $[2]
                     kind: 'set'
+            
+        > '{' @multiple(property, sep) '}'      => new @node.ObjectExpression properties: $[1]
                     
     > e \scalar e       => @binaryExpression($)
     > e \linear e       => @binaryExpression($)
+    > e \pow e          => @binaryExpression($)
     > e \logical e      => @binaryExpression($)
-    > e \comparison e   => @binaryExpression($)
+    > e \compare e      => @binaryExpression($)
     > \linear e         => @unaryExpression($)
     > \! e              => @unaryExpression($)
     > \not e            => @unaryExpression($)
-    > \( e \)           => $[1]
+    > '(' e ')'         => $[1]
     > function          => new @node.FunctionExpression($[0])
     > array
     > object
+    > literal
+    > identifier
+    > member-access
     
     # call expression
-    > e \( @multiple(expression, \, ) \)    =>
-        new @node.CallExpression
+    > e '(' @multiple(e, ',') ')'    =>
+        new @node.CallExpression do
             callee: $[0]
             arguments: $[2]
     
-    # member expressions
-    > e \. id   =>
-        new @node.MemberExpression
-            object: $[0]
-            property: $[2]
-            computed: false
-    > e \[ e \]  =>
-        new @node.MemberExpression
-            object: $[0]
-            property: $[2]
-            computed: true
-
+    > \this => new @node.ThisExpression({})
+    
 block
-    > \{ @multiple(statement, \eln) \}              => $[1]
-    > \indent @multiple(statement, \eln) \outdent   => $[1]
+    > '{' @multiple(statement, \nl) '}'            => $[1]
+    > \indent @multiple(statement, \nl) \dedent    => $[1]
 
 function
     parameter
-        > variable
-        > variable \= e
+        > identifier
+        > identifier \= e
 
     bound
         > \->
@@ -110,37 +137,37 @@ function
         > \~*
 
     params
-        > multiple(parameter, \,)
+        > @multiple(parameter, ',')
         
     body
-        > block => new @node.BlockStatement(statements: $[0])
+        > block => new @node.BlockStatement(body: $[0])
         
-    > \fn \( params \) body  =>
-        new @node.Function
+    > \fn '(' params ')' body  =>
+        new @node.Function do
             params: $[2]
-            body: $[5]
+            body: $[4]
             async: false
             generator: false
             bound: null
 
-    > \fn \( params \) bound body  =>
-        new @node.Function
+    > \fn '(' params ')' bound body  =>
+        new @node.Function do
             params: $[2]
             body: $[5]
             async: false
             generator: false
             bound: $[4] == "=>"
 
-    > \fn \( params \) type body  =>
-        new @node.Function
+    > \fn '(' params ')' type body  =>
+        new @node.Function do
             params: $[2]
             body: $[5]
             async: $[4].includes '~'
             generator: $[4].includes '*'
             bound: null
 
-    > \fn \( params \) bound type body  =>
-        new @node.Function
+    > \fn '(' params ')' bound type body  =>
+        new @node.Function do
             params: $[2]
             body: $[6]
             async: $[5].includes '~'
@@ -148,57 +175,62 @@ function
             bound: $[4] == '=>'        
     
 statement
+    return-statement
+        > \return       => new @node.ReturnStatement argument: null
+        > \return e     => new @node.ReturnStatement argument: $[1]
+
     blockable-statement
 
         blocky
             > blockable-statement
-            > block                 => new @node.BlockStatement(statements: $[0])
+            > block                 => new @node.BlockStatement(body: $[0])
 
         for-statement
-            > \for variable \in expression blocky =>
-                new @node.ForInStatement
+            > \for identifier \in expression blocky =>
+                new @node.ForInStatement do
                     left: $[1]
                     right: $[3]
                     block: $[4]
 
 
         do-statement
-            > \do block     => new @node.BlockStatement(statements: $[1])
+            > \do block     => new @node.BlockStatement(body: $[1])
 
 
         if-statement
             > \if e blocky =>
-                new @node.IfStatement
+                new @node.IfStatement do
                     test: $[1]
                     consequent: $[2]
                     alternate: null
+
             > \if e blocky \else blocky =>
-                new @node.IfStatement
+                new @node.IfStatement do
                     test: $[1]
                     consequent: $[2]
                     alternate: $[4]
 
         try-statement
             catch-clause
-                > \catch variable blocky =>
-                    new @node.CatchClause
+                > \catch identifier blocky =>
+                    new @node.CatchClause do
                         param: $[1]
                         body: $[2]
 
             > \try blocky catch-clause =>
-                new @node.TryStatement
+                new @node.TryStatement do
                     block: $[1]
                     handler: $[2]
                     finalizer: null
 
             > \try blocky catch-clause \finally blocky =>
-                new @node.TryStatement
+                new @node.TryStatement do
                     block: $[1]
                     handler: $[2]
                     finalizer: $[4]
 
             > \try blocky \finally blocky =>
-                new @node.TryStatement
+                new @node.TryStatement do
                     block: $[1]
                     handler: null
                     finalizer: $[3]
@@ -211,36 +243,52 @@ statement
     
     declaration
         declarator
-            id  =>
-                new @node.VariableDeclarator
+            > identifier  =>
+                new @node.VariableDeclarator do
                     constant: false
                     id: $[0]
                     init: null
                     
-            pattern \= e  =>
-                new @node.VariableDeclarator
+            > identifier \= e  =>
+                new @node.VariableDeclarator do
                     constant: true
                     id: $[0]
-                    init: null
+                    init: $[2]
                     
-            pattern \:= e  =>
-                new @node.VariableDeclarator
+            > identifier \:= e  =>
+                new @node.VariableDeclarator do
                     constant: false
                     id: $[0]
-                    init: null
+                    init: $[2]
         
-        \def @multiple(declarator, \,)  =>
-            new @node.VariableDeclaration
+        declarators
+            > declarator                    => [$[0]]
+            > declarators ',' declarator    => [...$[0], $[2]]
+        
+        > \def declarators  =>
+            new @node.VariableDeclaration do
                 declarations: $[1]
         
-        \def id function =>
-            new @node.FunctionDeclaration
+        > \def identifier function    =>
+            new @node.FunctionDeclaration do
                 id: $[1]
-                function: $[2]
+                value: $[2]
+	
+    assignment-statement
+        assignee
+            > identifier
     
-    > blockable-statement
+        > assignee '=' e  =>
+            new @node.AssignmentStatement do
+                left: $[0]
+                right: $[2]
+                operator: '='
         
+    > return-statement
+    > blockable-statement
+    > declaration
+    > assignment-statement
     
     > e =>
-        new @node.ExpressionStatement
-            expression: $[0]                            
+        new @node.ExpressionStatement do
+            expression: $[0]

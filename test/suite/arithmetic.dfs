@@ -1,0 +1,32 @@
+# functions
+
+##test: Addition and subtraction (basic)
+    eq(3 + 5, 8)
+    eq(7 - 2, 5)
+    
+##test: Addition and subtraction (associativity)
+    eq(3 + 5, 5 + 3)
+    eq(3 + 5 + 2, 5 + 2 + 3)
+    eq(6 - 3 - 2, 1)
+    eq(2 - 3 - 6, -7)
+    
+    
+##test: Addition with strings
+    eq(3 + 3 + '5', '65')
+    eq(3 + '5' + 3, '353')
+    eq('5' + 3 + 3, '533')
+    
+##test: Multiplication and division
+    eq(4 * 6, 6 * 4)
+    eq(6 * 4, 24)
+    eq(4 / 3 * 6, 8)
+    
+##test: Floor division
+    eq(7 // 3, 2)
+    eq(7 // 3 * 3, 6)
+    eq(7 // 3 / 2, 1)
+
+##test: Exponentiation
+    eq(7 ^ 2, 49)
+    eq(7 ^ 2 * 2, 98)
+    eq(3 * 4 ^ 2, 48)

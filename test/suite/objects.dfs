@@ -1,0 +1,53 @@
+
+# tests for basic object functionalities and member-expressions go here
+
+##test: Member expressions
+    def ob = 'hah'
+    
+    eq(ob.length, 3)
+    eq('yay' + 'a'.length, 'yay1')
+    eq(ob['length'], 3)
+    eq(33 + ob['length'], 36)
+    
+##test: Method Calls
+    def ob = 'yaya'
+    
+    eq(ob.slice(2), 'ya')
+    eq(ob['slice'](1), 'aya')
+    
+    throws(() {
+        def slice = ob['slice']
+        
+        slice(3)
+    })
+    
+##test: Data objects
+    def obj = {
+        a: 2
+        b: 55
+    }
+    
+    eq(obj.a, 2)
+    eq(obj.b, 55)
+    
+    eq(2 + obj.a, 4)
+
+##test: Objects with methods
+    def obj = {
+        a: 45
+        increase() {
+            @a = @a + 2
+        }
+        
+        getDouble() {
+            return this.a
+        }
+    }
+
+    
+
+    eq(obj.a, 45)
+    obj.increase()
+    eq(obj.a, 47)
+    eq(obj.getDouble(), 94)
+    
