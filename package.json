@@ -11,6 +11,9 @@
     "repl": "node --experimental-modules test/repl.js",
     "build-parsers": "crane -r e lib/grammar.crane > lib/expression-parser.mjs && crane -r module lib/grammar.crane > lib/module-parser.mjs"
   },
+  "bin": {
+    "defscript": "./bin/defscript.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gabrielratener/defscript.git"
