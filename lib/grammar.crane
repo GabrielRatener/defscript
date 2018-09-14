@@ -345,6 +345,12 @@ statement
                 right: $[2]
                 operator: '='
 
+        > assignee \reassign e =>
+            new @node.AssignmentStatement do
+                left: $[0]
+                right: $[2]
+                operator: $[1]
+
         > \assign assignment-pattern '=' e =>
             new @node.AssignmentStatement do
                 left: $[1]
