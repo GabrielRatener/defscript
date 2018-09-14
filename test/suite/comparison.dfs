@@ -1,0 +1,13 @@
+
+##test: Basic comparison
+	def a = 2, b = 3
+
+	eq(a < b, true)
+	eq(a + 2 < b, false)
+
+##test: Chained comparison
+	def a = 2, b = 3, c = 5
+
+	eq(a < b < c, true)
+	eq(a + 2 < b < c, false)
+	eq(a + 1 <= b < c < 6, true)

@@ -40,11 +40,9 @@
         }
         
         getDouble() {
-            return this.a
+            return 2 * this.a
         }
     }
-
-    
 
     eq(obj.a, 45)
     obj.increase()

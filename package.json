@@ -7,9 +7,9 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "tangler test/index.js",
-    "repl": "tangler test",
-    "build-parsers": "crane -r e lib/grammar.crane > lib/expression-parser.js && crane lib/grammar.crane > lib/module-parser.js"
+    "test": "node --experimental-modules test/index.js",
+    "repl": "node --experimental-modules test/repl.js",
+    "build-parsers": "crane -r e lib/grammar.crane > lib/expression-parser.mjs && crane -r module lib/grammar.crane > lib/module-parser.mjs"
   },
   "repository": {
     "type": "git",
@@ -28,10 +28,10 @@
   "homepage": "https://github.com/gabrielratener/defscript#readme",
   "dependencies": {
     "estemplate": "^0.5.1",
-    "lexie": "^1.0.1"
+    "lexie": "^1.0.2"
   },
   "devDependencies": {
-    "chalk": "^2.3.0",
+    "chalk": "^2.4.1",
     "livescript": "^1.5.0"
   }
 }

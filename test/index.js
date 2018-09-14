@@ -1,120 +1,135 @@
 
-import vm from "vm"
-import fs from "fs"
-import chalk from "chalk"
-import {tokenize, parse, compileAST, compile, getParser} from "../lib"
-import {untranslate} from "../lib/module-parser"
+const vm = require('vm');
+const fs = require('fs');
+const chalk = require('chalk');
 
-const failSymbol = chalk.red('\u2718');
-const winSymbol = chalk.green('\u2714');
+(async () => {
+    const {tokenize, parse, compileAST, compile, getParser} = await import('../lib');
+    const {untranslate} = await import("../lib/module-parser");
 
-const pad = (str, n) => {
-    return ('' + str).padEnd(n);
-}
+    const failSymbol = chalk.red('\u2718');
+    const winSymbol = chalk.green('\u2714');
 
-const getTests = function*() {
-    const tegex = /^##test:(.*)$/;
-    const files =
-      fs
-        .readdirSync(`${__dirname}/suite`)
-        .filter(name => name.endsWith('.dfs'))
-    
-    for (const file of files) {
-        const source = fs.readFileSync(`${__dirname}/suite/${file}`, 'utf8');
-        let testCase = null;
+    const pad = (str, n) => {
+        return ('' + str).padEnd(n);
+    }
+
+    const getTests = function*() {
+        const tegex = /^##test:(.*)$/;
+        const files =
+          fs
+            .readdirSync(`${__dirname}/suite`)
+            .filter(name => name.endsWith('.dfs'))
         
-        for (const line of source.split('\n')) {
-            const result = tegex.exec(line);
+        for (const file of files) {
+            const source = fs.readFileSync(`${__dirname}/suite/${file}`, 'utf8');
+            let testCase = null;
             
-            if (result === null) {
-                if (testCase !== null)
-                    testCase.code += `\n${line}`;
-            } else {
-                const [,rawTitle] = result;
+            for (const line of source.split('\n')) {
+                const result = tegex.exec(line);
                 
-                if (testCase !== null)
-                    yield testCase;
-                
-                testCase = {
-                    file,
-                    title: rawTitle.trim(),
-                    code: ''
+                if (result === null) {
+                    if (testCase !== null)
+                        testCase.code += `\n${line}`;
+                } else {
+                    const [,rawTitle] = result;
+                    
+                    if (testCase !== null)
+                        yield testCase;
+                    
+                    testCase = {
+                        file,
+                        title: rawTitle.trim(),
+                        code: ''
+                    }
                 }
             }
+            
+            if (testCase !== null)
+                yield testCase;
         }
+    }
+
+    const runtimeTest = (code) => {
+        const results = []
+        let promiseCount = 0;
+        let ran = false;
         
-        if (testCase !== null)
-            yield testCase;
-    }
-}
+        return new Promise((done) => {
+            const context = {
+                eq(a, b) {
+                    results.push(a === b);
+                },
+                assert(condition) {
+                    results.push(condition);  
+                },
+                arrayEq(a, b) {
+                    if (a.length !== b.length)
+                        results.push(false);
+                    else {
+                        for (let i = 0; i < a.length; i++) {
+                            if (a[i] !== b[i]) {
+                                results.push(false);
+                                return;
+                            }
+                        }
 
-const runtimeTest = (code) => {
-    const results = []
-    let promiseCount = 0;
-    let ran = false;
-    
-    return new Promise((done) => {
-        const context = {
-            eq(a, b) {
-                results.push(a === b);
-            },
-            assert(condition) {
-                results.push(condition);  
-            },
-            throws(fn) {
-                try {
-                    fn();
-                    results.push(false);
-                } catch (e) {
-                    results.push(true);
+                        results.push(true);
+                    }
+                },
+                throws(fn) {
+                    try {
+                        fn();
+                        results.push(false);
+                    } catch (e) {
+                        results.push(true);
+                    }
+                },
+                // opposite of throws
+                works(fn) {
+                    try {
+                        fn();
+                        results.push(true);
+                    } catch (e) {
+                        results.push(false);
+                    }
+                },
+                async(promise) {
+                    const index = results.length;
+                    const after = (won) => {
+                        results[index] = !!won;
+                        promiseCount--;
+                        if (ran && promiseCount === 0)
+                            done({results, error: null});
+                    }    
+
+                    promiseCount++;
+
+                    results.push(null);
+                    promise.then(after.bind(null, true), after.bind(null, false));
                 }
-            },
-            // opposite of throws
-            works(fn) {
-                try {
-                    fn();
-                    results.push(true);
-                } catch (e) {
-                    results.push(false);
-                }
-            },
-            async(promise) {
-                const index = results.length;
-                const after = (won) => {
-                    results[index] = !!won;
-                    promiseCount--;
-                    if (ran && promiseCount === 0)
-                        done({results, error: null});
-                }    
-
-                promiseCount++;
-
-                results.push(null);
-                promise.then(after.bind(null, true), after.bind(null, false));
             }
-        }
 
-        try {
-            vm.runInNewContext(code, context);
-            ran = true;
-            if (promiseCount === 0)
-                done({results, error: null});
-        } catch (error) {
-            done({results, error});
-        }        
-    });
-}
-
-const tryOut = (fn) => {
-    try {
-        fn();
-        return null;
-    } catch (e) {
-        return e;
+            try {
+                vm.runInNewContext(code, context);
+                ran = true;
+                if (promiseCount === 0)
+                    done({results, error: null});
+            } catch (error) {
+                done({results, error});
+            }        
+        });
     }
-}
 
-(async function() {
+    const tryOut = (fn) => {
+        try {
+            fn();
+            return null;
+        } catch (e) {
+            return e;
+        }
+    }
+
     let i = 0;
     const preliminaryTitles = [
         'lex',
@@ -122,9 +137,9 @@ const tryOut = (fn) => {
         'transform',
         'generate'
     ];
-    
+
     console.log(`${pad('#', 4)} ${pad('title', 40)} | ${preliminaryTitles.join(' > ')} > ${pad('run', 8)} details`);
-    
+
     for (const {title, file, code} of getTests()) {        
         const preliminary = [
             () => {
@@ -160,14 +175,18 @@ const tryOut = (fn) => {
             if (error)
                 details += ` (${error.message})`;
             console.log(`${pad(i, 4)} ${pad(title, 40)} | ${trace}   ${symbol}${pad('', 7)} ${details}`);
+        
+            if (error || status < results.length)
+                console.log(generated);
+
         } else {
             const [err] = preliminary.filter(e => !!e);
             const psr = getParser();
             let msg = err.message;
 
             if (err.hasOwnProperty('loc'))
-				msg += ` @ ${err.loc.start.line - 1}:${err.loc.start.column}`;
-			
+                msg += ` @ ${err.loc.start.line - 1}:${err.loc.start.column}`;
+            
             console.log(`${pad(i, 4)} ${pad(title, 40)} | ${trace}   ${failSymbol}${pad('', 7)} ${msg}`);
             
             /*
@@ -188,3 +207,4 @@ const tryOut = (fn) => {
         i++;
     }
 })();
+

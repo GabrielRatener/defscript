@@ -1,7 +1,9 @@
+%left \compare
+%left \logical
 %left \linear
 %left \scalar
 %right \pow
-%none '(' '[' ']' ')' '.'
+%none '{' '(' '[' ']' ')' '}' '.'
 
 module
     > @multiple(statement, sep)    =>
@@ -50,7 +52,7 @@ e
         
     array
         component
-            > expression
+            > e
         
         > '[' @multiple(component, sep) ']'     => new @node.ArrayExpression elements: $[1]
     
@@ -93,12 +95,23 @@ e
                     kind: 'set'
             
         > '{' @multiple(property, sep) '}'      => new @node.ObjectExpression properties: $[1]
-                    
+    
+    compare-chain
+        > e \compare e =>
+            new @node.CompareChainExpression do
+                operators: [$[1]]
+                expressions: [$[0], $[2]]
+
+        > compare-chain \compare e =>
+            new @node.CompareChainExpression do
+                operators: [...$[0].operators, $[1]]
+                expressions: [...$[0].expressions, $[2]]
+
+
     > e \scalar e       => @binaryExpression($)
     > e \linear e       => @binaryExpression($)
     > e \pow e          => @binaryExpression($)
     > e \logical e      => @binaryExpression($)
-    > e \compare e      => @binaryExpression($)
     > \linear e         => @unaryExpression($)
     > \! e              => @unaryExpression($)
     > \not e            => @unaryExpression($)
@@ -109,7 +122,12 @@ e
     > literal
     > identifier
     > member-access
-    
+    > compare-chain
+
+    > \await e =>
+        new @node.AwaitExpression do
+            argument: $[1]
+
     # call expression
     > e '(' @multiple(e, ',') ')'    =>
         new @node.CallExpression do
@@ -173,20 +191,58 @@ function
             async: $[5].includes '~'
             generator: $[5].includes '*'
             bound: $[4] == '=>'        
-    
-statement
-    return-statement
-        > \return       => new @node.ReturnStatement argument: null
-        > \return e     => new @node.ReturnStatement argument: $[1]
 
+assignment-pattern
+    object-pattern
+        property
+            > identifier ':' assignment-pattern =>
+                new @node.AssignmentProperty do
+                    key: $[0]
+                    value: $[2]
+                    kind: 'init'
+                    method: false
+                    shorthand: false
+                    computed: false
+
+            > identifier =>
+                new @node.AssignmentProperty do
+                    key: $[0]
+                    value: $[0]
+                    kind: 'init'
+                    method: false
+                    shorthand: false
+                    computed: false
+
+        > '{' @multiple(property, ',') '}' =>
+            new @node.ObjectPattern(properties: $[1])
+
+    array-pattern
+        component
+            > identifier
+            > assignment-pattern
+
+        > '[' @multiple(component, ',') ']' =>
+            new @node.ArrayPattern(elements: $[1])
+
+    > object-pattern
+    > array-pattern
+
+
+statement
     blockable-statement
 
         blocky
             > blockable-statement
             > block                 => new @node.BlockStatement(body: $[0])
 
+        while-statement
+            > \while e blocky =>
+                new @node.WhileStatement do
+                    test: $[1]
+                    body: $[2]
+
         for-statement
-            > \for identifier \in expression blocky =>
+            > \for identifier \in e blocky =>
                 new @node.ForInStatement do
                     left: $[1]
                     right: $[3]
@@ -235,27 +291,31 @@ statement
                     handler: null
                     finalizer: $[3]
 
-        > for-statement
         > while-statement
+        > for-statement
         > if-statement
         > try-statement
         > do-statement
-    
+
     declaration
+        assignee
+            > identifier
+            > \assign assignment-pattern => $[1]
+
         declarator
-            > identifier  =>
+            > assignee  =>
                 new @node.VariableDeclarator do
                     constant: false
                     id: $[0]
                     init: null
                     
-            > identifier \= e  =>
+            > assignee \= e  =>
                 new @node.VariableDeclarator do
                     constant: true
                     id: $[0]
                     init: $[2]
                     
-            > identifier \:= e  =>
+            > assignee \:= e  =>
                 new @node.VariableDeclarator do
                     constant: false
                     id: $[0]
@@ -273,22 +333,53 @@ statement
             new @node.FunctionDeclaration do
                 id: $[1]
                 value: $[2]
-	
+
     assignment-statement
         assignee
             > identifier
-    
+            > member-access
+
         > assignee '=' e  =>
             new @node.AssignmentStatement do
                 left: $[0]
                 right: $[2]
                 operator: '='
-        
-    > return-statement
+
+        > \assign assignment-pattern '=' e =>
+            new @node.AssignmentStatement do
+                left: $[1]
+                right: $[3]
+                operator: '='
+
+    control-flow-statement
+        return-statement
+            > \return       => new @node.ReturnStatement argument: null
+            > \return e     => new @node.ReturnStatement argument: $[1]
+
+        yield-statement
+            > \yield =>
+                new @node.YieldStatement do
+                    argument: null
+
+            > \yield e =>
+                new @node.YieldStatement do
+                    argument: $[1]
+
+        > return-statement
+        > yield-statement
+
+        > \break =>
+            new @node.BreakStatement do
+                label: null
+
+        > \continue =>
+            new @node.ContinueStatement do
+                label: null
+
     > blockable-statement
     > declaration
     > assignment-statement
-    
+    > control-flow-statement
     > e =>
         new @node.ExpressionStatement do
             expression: $[0]

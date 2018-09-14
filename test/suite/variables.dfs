@@ -3,9 +3,12 @@
     def a = 4, b = 5
     
     if b == 5 do
-        def a = 6
+        def a := 6
         def b = 9
-        
+
+        eq(a, 6)
+        a = 3
+
     eq(a + b, 9)
     
 ##test: Variables vs constants
