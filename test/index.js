@@ -4,7 +4,7 @@ const fs = require('fs');
 const chalk = require('chalk');
 
 (async () => {
-    const {tokenize, parse, compileAST, compile, getParser} = await import('../lib');
+    const {tokenize, parse, compileToAST, compile, getParser} = await import('../lib');
     const {untranslate} = await import("../lib/module-parser");
 
     const failSymbol = chalk.red('\u2718');
@@ -146,7 +146,7 @@ const chalk = require('chalk');
                 for (const token of tokenize(code)) {};
             },
             () => parse(code, 'module'),
-            () => compileAST(code, 'module'),
+            () => compileToAST(code, 'module'),
             () => compile(code, 'module')
         ]
         .map(fn => tryOut(fn));

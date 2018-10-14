@@ -9,6 +9,7 @@
   "scripts": {
     "test": "node --experimental-modules test/index.js",
     "repl": "node --experimental-modules test/repl.js",
+    "build": "rollup -c",
     "build-parsers": "crane -r e lib/grammar.crane > lib/expression-parser.mjs && crane -r module lib/grammar.crane > lib/module-parser.mjs"
   },
   "bin": {
@@ -32,7 +33,7 @@
   "dependencies": {
     "commander": "^2.18.0",
     "estemplate": "^0.5.1",
-    "lexie": "^1.0.2"
+    "lexie": "^1.0.5"
   },
   "devDependencies": {
     "chalk": "^2.4.1",

@@ -27,8 +27,19 @@ sep
     > \nl
 
 member-access
-    # member expressions
+    # member expressions ...
+
+    obj
+        > \obj  => new @node.VirtualObjectExpression({})
+
     > e \. identifier   =>
+        new @node.MemberExpression do
+            object: $[0]
+            property: $[2]
+            computed: false
+
+    # used for cascade statements only
+    > obj \. identifier  =>
         new @node.MemberExpression do
             object: $[0]
             property: $[2]
@@ -136,6 +147,8 @@ e
     
     > \this => new @node.ThisExpression({})
     
+
+
 block
     > '{' @multiple(statement, \nl) '}'            => $[1]
     > \indent @multiple(statement, \nl) \dedent    => $[1]
@@ -226,6 +239,7 @@ assignment-pattern
 
     > object-pattern
     > array-pattern
+
 
 
 statement
@@ -357,6 +371,8 @@ statement
                 right: $[3]
                 operator: '='
 
+
+
     control-flow-statement
         return-statement
             > \return       => new @node.ReturnStatement argument: null
@@ -382,10 +398,31 @@ statement
             new @node.ContinueStatement do
                 label: null
 
+    cascade-statement
+        component
+            > assignment-statement
+            > expression-statement
+
+        > e \ref component =>
+            new @node.CascadeStatement do
+                root: $[0],
+                degrees: [$[1].length]
+                statements: [$[2]]
+
+        > cascade-statement \ref component =>
+            new @node.CascadeStatement do
+                root: $[0].root
+                degrees: [...$[0].degrees, $[1].length]
+                statements: [...$[0].statements, $[2]]
+
+    expression-statement
+        > e =>
+            new @node.ExpressionStatement do
+                expression: $[0]
+
+    > cascade-statement
     > blockable-statement
     > declaration
     > assignment-statement
     > control-flow-statement
-    > e =>
-        new @node.ExpressionStatement do
-            expression: $[0]
+    > expression-statement

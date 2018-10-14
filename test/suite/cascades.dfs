@@ -1,0 +1,66 @@
+
+
+##test: First degree cascades
+	def obj = {
+		a: 4
+		b: 2
+		result: null
+
+		sum() {
+			@result = @a + @b
+		}
+
+		product() {
+			@result = @a * @b
+		}
+	}
+
+	obj
+	|.a = 2
+	|.b = 5
+	|.sum()
+
+	eq(obj.result, 7)
+
+	obj
+	|.a = 7
+	|.b = 10
+	|.product()
+
+	eq(obj.result, 70)
+
+##test: Second degree cascades
+	def obj = {
+		a: 4
+		b: 2
+		result: null
+		someobj: {
+			c: 1
+			d: 3
+			result: null
+			sum() {
+				@result = @c + @d
+			}
+		}
+
+		sum() {
+			@result = @a + @b
+		}
+
+		product() {
+			@result = @a * @b
+		}
+	}
+
+	obj
+	|.a = 1
+	|.b = 5
+	|.sum()
+	|.someobj
+	||.c = 1000
+	||.sum()
+	|.sum()
+
+	eq(obj.result, 6)
+	eq(obj.someobj.result, 1003)
+
