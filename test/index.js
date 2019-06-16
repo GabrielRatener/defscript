@@ -139,14 +139,15 @@ const chalk = require('chalk');
 
     console.log(`${pad('#', 4)} ${pad('title', 40)} | ${preliminaryTitles.join(' > ')} > ${pad('run', 8)} details`);
 
-    for (const {title, file, code} of getTests()) {        
+    for (const {title, file, code} of getTests()) {
         const preliminary = [
             () => {
-                for (const token of tokenize(code)) {};
+                for (const token of tokenize(code)) {
+                };
             },
             () => parse(code, {type: 'module'}),
             () => compileToAST(code, {type: 'module'}),
-            () => compile(code, 'module')
+            () => compile(code, {type: 'module'})
         ]
         .map(fn => tryOut(fn));
         
@@ -180,7 +181,6 @@ const chalk = require('chalk');
 
         } else {
             const [err] = preliminary.filter(e => !!e);
-            const psr = getParser();
             let msg = err.message;
 
             if (err.hasOwnProperty('loc'))

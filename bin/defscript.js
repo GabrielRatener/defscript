@@ -31,6 +31,7 @@ import('../lib')
 					const module = {exports: {}};
 					const filename = path.join(process.cwd(), file);
 					const dirname = path.dirname(filename);
+					
 					function injectedRequire(dest) {
 						return require(path.join(dirname, dest));
 					}

@@ -240,6 +240,93 @@ assignment-pattern
     > object-pattern
     > array-pattern
 
+module-declaration
+    source
+        > \string => @literal $[0].slice 1, -1
+
+    import-declaration
+        namespace-specifier
+            > '*' \as identifier =>
+                new @node.ImportNamespaceSpecifier(local: $[2])
+
+        default-specifier
+            > \identifier =>
+                new @node.ImportDefaultSpecifier(local: $[0])
+
+        import-list
+            import-item
+                > identifier =>
+                    new @node.ImportSpecifier do
+                        imported: $[0]
+                        local: $[0]
+
+                > identifier \as identifier =>
+                    new @node.ImportSpecifier do
+                        imported: $[0]
+                        local: $[2]
+
+            > @multiple(import-item, ',')
+
+        > \import namespace-specifier \from source =>
+            new @node.ImportDeclaration do
+                specifiers: [$[1]]
+                source: $[3]
+
+        > \import default-specifier \from source =>
+            new @node.ImportDeclaration do
+                specifiers: [$[1]]
+                source: $[3]
+
+        > \import '{' import-list '}' \from source =>
+            new @node.ImportDeclaration do
+                speficiers: $[2]
+                source: $[5]
+
+        > \import default-specifier ',' '{' import-list '}' \from source =>
+            new @node.ImportDeclaration do
+                speficiers: [$[1], ...$[4]]
+                source: $[7]
+
+    export-declaration
+        export-item
+            > identifier =>
+                new @node.ExportSpecifier do
+                    exported: $[0]
+                    local: $[0]
+
+            > identifier \as identifier =>
+                new @node.ExportSpecifier do
+                    exported: $[2]
+                    local: $[0]
+
+        > \export statement.declaration =>
+            new @node.ExportNamedDeclaration do
+                declaration: $[1]
+                speficiers: []
+                source: null
+
+        > \export '{' @multiple(export-item, ',') '}' =>
+            new @node.ExportNamedDeclaration do
+                declaration: null
+                speficiers: $[2]
+                source: null
+
+        > \export '{' @multiple(export-item, ',') '}' \from source =>
+            new @node.ExportNamedDeclaration do
+                declaration: null
+                speficiers: $[2]
+                source: $[5]
+
+        # e.g. export default someexpression
+        > \export \default e =>
+            new @node.ExportDefaultDeclaration do
+                declaration: $[2]
+
+        # e.g. export * from "some/other/module"
+        > \export '*' \from source =>
+            new @node.ExportAlltDeclaration do
+                source: $[3]
+
 
 
 statement
