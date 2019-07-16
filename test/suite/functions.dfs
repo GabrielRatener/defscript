@@ -96,7 +96,7 @@
 	}
 
 	arrayEq(obj2.get3(), [4, 8, 12])
-	arrayEq(obj2.get2(), [2, 4])
+	arrayEq(obj2.get2(), [4, 8])
 
 ##test: Explicit this binding
 	def obj1 = {
@@ -157,4 +157,4 @@
 	}
 
 	arrayEq(Array.from(obj2.get3()), [4, 8, 12])
-	arrayEq(Array.from(obj2.get2()), [2, 4])
+	arrayEq(Array.from(obj2.get2()), [4, 8])

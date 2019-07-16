@@ -49,3 +49,83 @@
     eq(obj.a, 47)
     eq(obj.getDouble(), 94)
     
+##test: Immutable this binding in methods
+    def obj = {
+        a: 45
+        increase() {
+            @a = @a + 2
+        }
+        
+        getDouble() {
+            return 2 * this.a
+        }
+    }
+
+    def obj2 = {
+        a: 35
+        increase: obj.increase,
+        getDouble: obj.getDouble
+    }
+
+    eq(obj2.a, 35)
+    obj2.increase()
+    eq(obj2.a, 35)
+    eq(obj.a, 47)
+    eq(obj2.getDouble(), 94)
+
+##test: Immutable this (nested functions)
+    def obj = {
+        a: 45
+        
+        getMultiplier() {
+            return (n) {
+                return @a * n
+            }
+        }
+
+        getSubtractor() {
+            return (n) -> {
+                return @a - n
+            }
+        }
+    }
+
+    def obj2 = {
+        a: 35
+        getMultiplier: obj.getMultiplier
+        subtractor: obj.getSubtractor()
+    }
+
+    def multiplier = obj2.getMultiplier()
+
+    eq(multiplier(3), 135)
+    eq(obj2.subtractor(3), 32)
+
+##test: Immutable this (nested objects)
+    def obj = {
+        a: 45
+        
+        getObject() {            
+            return {
+                a: 25
+                subtract(n) {
+                    return @a - n
+                }
+
+                multiply(n) -> {
+                    return @a * n
+                }
+            }
+        }
+    }
+
+    def object = obj.getObject()
+
+    def obj2 = {
+        a: 35
+        subtract: object.subtract
+        multiply: object.multiply
+    }
+
+    eq(obj2.subtract(2), 23)
+    eq(obj2.multiply(2), 70)
