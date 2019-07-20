@@ -15,6 +15,38 @@
     
     eq(div(8, 4), 2)
 
+##test: Function param deconstruction
+
+	def div([a, b]) {
+		return a // b
+	}
+
+	def add({a, b}) {
+		return a + b
+	}
+
+	eq(div([8, 4]), 2)
+	eq(add({a: 8, b: 4}), 12)
+
+##test: Function default parameters
+
+	def div(a, b = 3) {
+		return a // b
+	}
+
+	def add(c, [a, b] = [1, 5]) {
+		return c + a + b
+	}
+
+	def sub(a = 3) {
+		return 10 - a
+	}
+
+
+	eq(div(12), 4)
+	eq(add(4), 10)
+	eq(sub(), 7)
+
 ##test: Function hoisting
     eq(minu(8, 5), 3)
 

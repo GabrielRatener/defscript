@@ -106,6 +106,9 @@ const chalk = require('chalk');
 
                     results.push(null);
                     promise.then(after.bind(null, true), after.bind(null, false));
+                },
+                error(message) {
+                    throw new Error(message);
                 }
             }
 
@@ -143,7 +146,8 @@ const chalk = require('chalk');
         const preliminary = [
             () => {
                 for (const token of tokenize(code)) {
-                };
+                    // console.log(token.type, token.value);
+                }
             },
             () => parse(code, {type: 'module'}),
             () => compileToAST(code, {type: 'module'}),

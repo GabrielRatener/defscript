@@ -10,7 +10,8 @@
     "test": "node --experimental-modules test/index.js",
     "repl": "node --experimental-modules test/repl.js",
     "build": "rollup -c",
-    "build-parsers": "crane -r e lib/grammar.crane > lib/expression-parser.mjs && crane -r module lib/grammar.crane > lib/module-parser.mjs"
+    "build-parser": "crane lib/grammar.crane -r module > lib/parser.out.mjs",
+    "build-parsers": "crane lib/grammar.crane -r e > lib/expression-parser.mjs && crane lib/grammar.crane -r module > lib/module-parser.mjs"
   },
   "bin": {
     "defscript": "./bin/defscript.js"

@@ -155,8 +155,11 @@ block
 
 function
     parameter
-        > identifier
-        > identifier \= e
+        > assignment-pattern
+        > assignee '=' e  =>
+            new @node.AssignmentPattern do
+                left: $[0]
+                right: $[2]
 
     bound
         > \->
@@ -203,7 +206,7 @@ function
             body: $[6]
             async: $[5].includes '~'
             generator: $[5].includes '*'
-            bound: $[4] == '=>'        
+            bound: $[4] == '=>'
 
 assignment-pattern
     object-pattern
@@ -231,7 +234,6 @@ assignment-pattern
 
     array-pattern
         component
-            > identifier
             > assignment-pattern
 
         > '[' @multiple(component, ',') ']' =>
@@ -239,6 +241,11 @@ assignment-pattern
 
     > object-pattern
     > array-pattern
+    > identifier
+
+assignee
+    > \assign assignment-pattern    => $[1]
+    > identifier
 
 module-declaration
     source
@@ -343,11 +350,12 @@ statement
                     body: $[2]
 
         for-statement
-            > \for identifier \in e blocky =>
+            > \for assignment-pattern \in e blocky =>
                 new @node.ForInStatement do
                     left: $[1]
                     right: $[3]
-                    block: $[4]
+                    body: $[4]
+                    async: false
 
 
         do-statement
@@ -369,10 +377,11 @@ statement
 
         try-statement
             catch-clause
-                > \catch identifier blocky =>
+                > \catch assignment-pattern blocky =>
                     new @node.CatchClause do
                         param: $[1]
                         body: $[2]
+                        guard: null
 
             > \try blocky catch-clause =>
                 new @node.TryStatement do
@@ -399,10 +408,6 @@ statement
         > do-statement
 
     declaration
-        assignee
-            > identifier
-            > \assign assignment-pattern => $[1]
-
         declarator
             > assignee  =>
                 new @node.VariableDeclarator do

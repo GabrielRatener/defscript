@@ -1,0 +1,79 @@
+
+##test: Basic if/else
+    def a = 0, b = 2, c := 0
+
+    if a < b do
+        c = 2
+    else
+        c = 4
+    
+    eq(c, 2)
+
+    if b != c do
+        c = 99
+    else
+        c = 66
+
+    eq(c, 66)
+    
+##test: Basic while loop
+    def array = [5, 2, 1]
+    def array2 = []
+    def i := 0
+
+    while i < array.length do
+        array2.push(array[i] + 2)
+        i += 1
+
+    arrayEq(array2, [7, 4, 3])
+
+##test: Basic for loop
+    def array = [5, 2, 1]
+    def array2 = []
+
+    for i in array do
+        array2.push(i * i)
+
+    arrayEq(array2, [25, 4, 1])
+
+##test: Deconstruction in for loop
+    def array = [5, 2, 1].map((value, i) {
+        return {value, i}
+    })
+
+    def array2 = []
+
+    for {value, i} in array do
+        array2.push(i + value)
+
+    arrayEq(array2, [5, 3, 3])
+
+
+##test: Basic try/catch
+    works(() {
+        try
+            error('yuck')
+        catch e do
+            return
+    })
+
+    throws(() {
+        try
+            error('Oh shit!')
+
+        catch e do
+
+            error('Oh shit again!')
+    })
+
+##test: Deconstruction in try/catch
+    def m := null
+
+    works(() {
+        try
+            error('yuck')
+        catch {message} do
+            m = message
+    })
+
+    eq(m, 'yuck')
