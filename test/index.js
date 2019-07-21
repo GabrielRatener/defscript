@@ -56,6 +56,21 @@ const chalk = require('chalk');
         
         return new Promise((done) => {
             const context = {
+                clearTimeout,
+                clearInterval,
+
+                log(...args) {
+                    console.log(...args);
+                },
+
+                timeout(ms, fn) {
+                    return setTimeout(fn, ms);
+                },
+
+                interval(ms, fn) {
+                    return setInterval(fn, ms);
+                },
+
                 eq(a, b) {
                     results.push(a === b);
                 },

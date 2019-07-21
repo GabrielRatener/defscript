@@ -104,6 +104,38 @@
 		eq(truth[i], arr[i])
 		i = i + 1
 
+##test: Async functions
+
+	def i := 0
+
+	def sleep(ms) {
+		return new Promise((win, fail) {
+			timeout(ms, win)
+		})
+	}
+
+	def doTest() ~ {
+		def prom = sleepABunch()
+
+		# async function should only start executing on next tick
+		eq(i, 2)
+		eq(prom.constructor.name, 'Promise')
+
+		await prom
+
+		eq(i, 10)
+	}
+
+	def sleepABunch() ~ {
+		i += 2
+		await sleep(500)
+		i += 5
+		await sleep(200)
+		i += 3
+	}
+
+	async(doTest())
+
 ##test: This binding
 	def obj1 = {
 		prop: 4

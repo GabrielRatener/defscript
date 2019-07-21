@@ -119,6 +119,26 @@ e
                 expressions: [...$[0].expressions, $[2]]
 
 
+    call-expression
+        arguments
+            > @multiple(e, ',')
+
+        # call expression
+        > e '(' arguments ')'    =>
+            new @node.CallExpression do
+                callee: $[0]
+                arguments: $[2]
+
+        > \new identifier '(' arguments ')' =>
+            new @node.NewExpression do
+                callee: $[1]
+                arguments: $[3]
+
+        > \new member-access '(' arguments ')' =>
+            new @node.NewExpression do
+                callee: $[1]
+                arguments: $[3]
+
     > e \scalar e       => @binaryExpression($)
     > e \linear e       => @binaryExpression($)
     > e \pow e          => @binaryExpression($)
@@ -134,20 +154,14 @@ e
     > identifier
     > member-access
     > compare-chain
+    > call-expression
 
     > \await e =>
         new @node.AwaitExpression do
             argument: $[1]
-
-    # call expression
-    > e '(' @multiple(e, ',') ')'    =>
-        new @node.CallExpression do
-            callee: $[0]
-            arguments: $[2]
     
     > \this => new @node.ThisExpression({})
     
-
 
 block
     > '{' @multiple(statement, \nl) '}'            => $[1]
