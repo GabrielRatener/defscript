@@ -1,23 +1,32 @@
 
 ##test: Object destructuring in declarations
-	def {a, b} = {a: 4, b: 5, c: 2}
+	def {a, b, ...rest} = {a: 4, b: 5, c: 2, d: 55}
 
 	eq(a, 4)
 	eq(b, 5)
+	eq(Object.keys(rest).length, 2)
+	eq(rest.c + rest.d, 57a)
 
 ##test: Array destructuring in declarations
-	def [a, b] = [4, 5, 7]
+	def arr = [4, 5, 7]
+	def [a, b] = arr
+	def [g, ...rest] = arr
 
 	eq(a, 4)
 	eq(b, 5)
+
+	eq(rest.length, 2)
+	eq(g + rest[1], 11)
 
 ##test: Object destructuring in assignment
 	def a := 5
 	def b := 3
+	def rest := null
 
 	def obj = {
 		a: a + 2
-		b: b + 3
+		b: b + 3,
+		c: 7
 	}
 
 	{a, b} = obj
@@ -25,15 +34,26 @@
 	eq(a, 7)
 	eq(b, 6)
 
+	{a, b, ...rest} = obj
+
+	eq(Object.keys(rest).length, 1)
+	eq(rest.c, 7)
+
 ##test: Array destructuring in assignment
 	def a := 5
 	def b := 3
+	def arr = [a + 4, b + 5, 7, 4]
+	def rest := []
 
-	[a, b] = [a + 4, b + 5, 7]
+	[a, b] = arr
 
 	eq(a, 9)
 	eq(b, 8)
 
+	[a, b, ...rest] = arr
+
+	eq(rest.length, 2)
+	eq(a + b + rest[0] + rest[1], 28)
 
 ##test: Destructuring in constant declarations
 	def {a, b} := {a: 4, b: 5, c: 2}

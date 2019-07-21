@@ -59,16 +59,21 @@ member-access
 
 e
     splat
-        > \... e
+        > \... e    =>
+            new @node.SpreadElement do
+                argument: $[1]
         
     array
         component
             > e
+            > splat
         
         > '[' @multiple(component, sep) ']'     => new @node.ArrayExpression elements: $[1]
     
     object
         property
+            > splat
+
             > identifier  =>
                 new @node.Property do
                     key: $[0]
@@ -118,10 +123,13 @@ e
                 operators: [...$[0].operators, $[1]]
                 expressions: [...$[0].expressions, $[2]]
 
-
     call-expression
         arguments
-            > @multiple(e, ',')
+            argument
+                > e
+                > splat
+
+            > @multiple(argument, ',')
 
         # call expression
         > e '(' arguments ')'    =>
@@ -170,6 +178,7 @@ block
 function
     parameter
         > assignment-pattern
+        > assignment-pattern.rest
         > assignee '=' e  =>
             new @node.AssignmentPattern do
                 left: $[0]
@@ -223,8 +232,15 @@ function
             bound: $[4] == '=>'
 
 assignment-pattern
+    rest
+        > \... assignment-pattern  =>
+            new @node.RestElement do
+                argument: $[1]
+
     object-pattern
         property
+            > rest
+
             > identifier ':' assignment-pattern =>
                 new @node.AssignmentProperty do
                     key: $[0]
@@ -248,6 +264,7 @@ assignment-pattern
 
     array-pattern
         component
+            > rest
             > assignment-pattern
 
         > '[' @multiple(component, ',') ']' =>

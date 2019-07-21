@@ -28,6 +28,39 @@
 	eq(div([8, 4]), 2)
 	eq(add({a: 8, b: 4}), 12)
 
+##test: Function rest params
+
+	def sum(...args) {
+		def val := 0
+
+		for num in args do
+			val += num
+
+		return val
+	}
+
+	def betterSum(a, ...args) {
+		def val := a
+
+		for num in args do
+			val += num
+
+		return val
+	}
+
+	eq(sum(1, 2, 3), 6)
+	eq(betterSum(3, 4, 2, 1), 10)
+
+##test: Function call spreads
+	def linear(a, b, c) {
+		return a * b + c
+	}
+
+	def arr = [3, 2]
+
+	eq(linear(3, ...arr), 11)
+	eq(linear(...arr, 3), 9)
+
 ##test: Function default parameters
 
 	def div(a, b = 3) {
