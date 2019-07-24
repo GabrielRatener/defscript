@@ -1,0 +1,123 @@
+
+##test: Class basics
+    def class Boobs {
+        constructor(areFake = false) {
+            @areFake = areFake
+        }
+
+        makeFake() {
+            @areFake = true
+        }
+    }
+
+    def boobs = new Boobs()
+    def boobsToo = new Boobs(true)
+
+    eq(boobs.areFake, false)
+    eq(boobsToo.areFake, true)
+
+    boobs.makeFake()
+
+    eq(boobs.areFake, true)
+
+##test: Class static methods
+    def class Car {
+        static axles() {
+            return 2
+        }
+
+        constructor(wheelsPerAxle = 2) {
+            @wheels = wheelsPerAxle * Car.axles()
+        }
+    }
+
+    def car = new Car(3)
+
+    eq(car.wheels, 6)
+    eq(Car.axles(), 2)
+
+##test: Class bound methods
+
+    def obj = {
+        axles: 3
+
+        getCar() -> {
+            def class Car {
+
+                constructor(wheelsPerAxle = 2) {
+                    @axles = 2
+                    @wheels = wheelsPerAxle * @axles
+                }
+
+                globalAxles() => {
+                    return @axles
+                }
+            }
+
+            return new Car()
+        }
+
+        getOtherCar() {
+            def class Car {
+
+                constructor(wheelsPerAxle = 3) {
+                    @axles = 3
+                    @wheels = wheelsPerAxle * @axles
+                }
+
+                globalAxles() => {
+                    return @axles
+                }
+            }
+
+            return new Car()
+        }
+
+    }
+
+    def obj2 = {
+        axles: 25
+        getCar: obj.getOtherCar
+    }
+
+    def car = obj.getCar()
+    def otherCar = obj2.getCar()
+
+    eq(car.wheels, 4)
+    eq(car.globalAxles(), 3)
+    eq(otherCar.wheels, 9)
+    eq(otherCar.globalAxles(), 3)
+
+##test: Class inheritance
+    def class Car {
+        constructor() {
+            @axles = 2
+            @wheels = 6
+            @isCool = false
+        }
+
+        getWheelsPerAxle() {
+            return @wheels / @axles
+        }
+    }
+
+    def class Ferrari : Car {
+        constructor() {
+            super()
+
+            @wheels = 4
+            @isCool = true
+        }
+    }
+
+    def car = new Car()
+    def ferrari = new Ferrari()
+
+    eq(car.isCool, false)
+    eq(ferrari.isCool, true)
+    eq(car.getWheelsPerAxle(), 3)
+    eq(ferrari.getWheelsPerAxle(), 2)
+
+
+
+    

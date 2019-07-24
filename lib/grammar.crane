@@ -97,6 +97,7 @@ e
                     id: $[0]
                     definition: $[1]
                     kind: null
+                    subject: 'object'
                     
             > \get identifier function =>
                 new @node.Method do
@@ -111,7 +112,7 @@ e
                     kind: 'set'
             
         > '{' @multiple(property, sep) '}'      => new @node.ObjectExpression properties: $[1]
-    
+
     compare-chain
         > e \compare e =>
             new @node.CompareChainExpression do
@@ -156,6 +157,7 @@ e
     > \not e            => @unaryExpression($)
     > '(' e ')'         => $[1]
     > function          => new @node.FunctionExpression($[0])
+    > class.expression
     > array
     > object
     > literal
@@ -365,6 +367,73 @@ module-declaration
             new @node.ExportAlltDeclaration do
                 source: $[3]
 
+class
+    class-body
+        class-item
+            > \static identifier function   =>
+                new @node.MethodDefinition do
+                    key: $[1]
+                    value: $[2]
+                    kind: "method"
+                    computed: false
+                    static: true
+
+            > identifier function  =>
+                new @node.MethodDefinition do
+                    key: $[0]
+                    value: $[1]
+                    kind:
+                        if $[0].name == "constructor"
+                            "constructor"
+                        else
+                            "method"
+                    computed: false
+                    static: false
+
+            > \get identifier function  =>
+                new @node.MethodDefinition do
+                    key: $[0]
+                    value: $[1]
+                    kind: "get"
+                    computed: false
+                    static: false
+
+            > \set identifier function  =>
+                new @node.MethodDefinition do
+                    key: $[0]
+                    value: $[1]
+                    kind: "set"
+                    computed: false
+                    static: false
+
+        > @multiple(class-item, sep)
+
+    declaration
+        > \def \class identifier '{' class-body '}'   =>
+            new @node.ClassDeclaration do
+                id: $[2]
+                superClass: null
+                body: $[4]
+
+        > \def \class identifier ':' e '{' class-body '}'   =>
+            new @node.ClassDeclaration do
+                id: $[2]
+                superClass: $[4]
+                body: $[6]
+
+    expression
+        > \class '{' class-body '}'   =>
+            new @node.ClassExpression do
+                id: null
+                superClass: null
+                body: $[2]
+
+        > \class ':' e '{' class-body '}'   =>
+            new @node.ClassExpression do
+                id: null
+                superClass: $[2]
+                body: $[4]
+
 
 
 statement
@@ -387,6 +456,13 @@ statement
                     right: $[3]
                     body: $[4]
                     async: false
+
+            > \for assignment-pattern \on e blocky =>
+                new @node.ForInStatement do
+                    left: $[1]
+                    right: $[3]
+                    body: $[4]
+                    async: true
 
 
         do-statement
@@ -462,6 +538,7 @@ statement
             > declarator                    => [$[0]]
             > declarators ',' declarator    => [...$[0], $[2]]
         
+
         > \def declarators  =>
             new @node.VariableDeclaration do
                 declarations: $[1]
@@ -471,6 +548,8 @@ statement
                 id: $[1]
                 value: $[2]
 
+        > class.declaration
+    
     assignment-statement
         assignee
             > identifier
@@ -493,8 +572,6 @@ statement
                 left: $[1]
                 right: $[3]
                 operator: '='
-
-
 
     control-flow-statement
         return-statement

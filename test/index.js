@@ -109,29 +109,32 @@ const chalk = require('chalk');
                     }
                 },
                 async(promise) {
-                    const index = results.length;
-                    const after = (won) => {
-                        results[index] = !!won;
-                        promiseCount--;
-                        if (ran && promiseCount === 0)
-                            done({results, error: null});
-                    }    
-
-                    promiseCount++;
-
-                    results.push(null);
-                    promise.then(after.bind(null, true), after.bind(null, false));
+                    if (asyncTest) {
+                        console.error('Only one async call allowed per test');
+                    } else {
+                        asyncTest = new Promise((win, fail) => {
+                            promise.then(() => win(null), (err) => win(err));
+                        });
+                    }
                 },
                 error(message) {
                     throw new Error(message);
                 }
             }
 
+            let asyncTest = null;
+
             try {
                 vm.runInNewContext(code, context);
                 ran = true;
-                if (promiseCount === 0)
+                
+                if (asyncTest) {
+                    asyncTest.then((error) => {
+                        done({results, error});
+                    });
+                } else {
                     done({results, error: null});
+                }
             } catch (error) {
                 done({results, error});
             }        

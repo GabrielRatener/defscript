@@ -5,7 +5,7 @@
 	eq(a, 4)
 	eq(b, 5)
 	eq(Object.keys(rest).length, 2)
-	eq(rest.c + rest.d, 57a)
+	eq(rest.c + rest.d, 57)
 
 ##test: Array destructuring in declarations
 	def arr = [4, 5, 7]
