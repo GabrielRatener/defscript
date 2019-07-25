@@ -36,6 +36,63 @@
     eq(car.wheels, 6)
     eq(Car.axles(), 2)
 
+##test: Class symbolic methods
+    def class Car {
+        static axles() {
+            return 2
+        }
+
+        constructor(wheelsPerAxle = 2) {
+            @wheels = wheelsPerAxle * Car.axles()
+        }
+
+        @@ iterator() * {
+            def i := 0
+            
+            while i < @wheels do
+                yield i
+
+                i += 1
+        }
+    }
+
+    def obj = {
+        legs: 3
+        getClass() {
+            def class Animal {
+                constructor() {
+                    @legs = 4
+                }
+
+                @@ iterator() => * {
+                    def i := 0
+
+                    while i < 3 do
+                        yield i * @legs
+                        i += 1
+                }
+            }
+
+            return Animal
+        }
+    }
+
+    def car = new Car()
+    def list = [], listToo = []
+    def AnimalClass = obj.getClass()
+    def animal = new AnimalClass()
+
+    for wheel in car do
+        list.push(wheel)
+
+    for thing in animal do
+        listToo.push(thing)
+
+    eq(animal.legs, 4)
+    arrayEq(listToo, [0, 3, 6])
+    arrayEq(list, [0, 1, 2, 3])
+
+
 ##test: Class bound methods
 
     def obj = {

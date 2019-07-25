@@ -74,7 +74,7 @@ e
         property
             > splat
 
-            > identifier  =>
+            > identifier =>
                 new @node.Property do
                     key: $[0]
                     value: $[0]
@@ -98,7 +98,13 @@ e
                     definition: $[1]
                     kind: null
                     subject: 'object'
-                    
+
+            > '@@' identifier function =>
+                new @node.Method do
+                    id: $[1]
+                    definition: $[2]
+                    kind: "symbol"
+
             > \get identifier function =>
                 new @node.Method do
                     id: $[1]
@@ -389,6 +395,15 @@ class
                             "method"
                     computed: false
                     static: false
+
+            > '@@' identifier function =>
+                new @node.MethodDefinition do
+                    key: $[1]
+                    value: $[2]
+                    kind: "symbol"
+                    computed: true
+                    static: false
+
 
             > \get identifier function  =>
                 new @node.MethodDefinition do

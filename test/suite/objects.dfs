@@ -49,6 +49,35 @@
     eq(obj.a, 47)
     eq(obj.getDouble(), 94)
     
+##test: Objects with symbolic methods
+    def obj = {
+        a: 45
+        increase() {
+            @a = @a + 2
+        }
+        
+        getDouble() {
+            return 2 * this.a
+        }
+
+        @@ iterator() * {
+            def i := 0
+
+            while i < 4 do
+                yield @a + i
+
+                i += 1
+        }
+    }
+
+    def list = []
+    
+    for num in obj do
+        list.push(num)
+
+    arrayEq(list, [45, 46, 47, 48])
+
+
 ##test: Immutable this binding in methods
     def obj = {
         a: 45
