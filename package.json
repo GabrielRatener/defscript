@@ -1,20 +1,18 @@
 {
   "name": "defscript",
+  "type": "module",
   "version": "0.0.2",
   "description": "A simple, solid compile-to-js language with a extension API",
-  "main": "index.js",
+  "main": "index.mjs",
   "directories": {
     "lib": "lib"
   },
   "scripts": {
     "test": "node --experimental-modules test/index.js",
-    "repl": "node --experimental-modules test/repl.js",
-    "build": "rollup -c",
-    "build-parser": "crane lib/grammar.crane -r module > lib/parser.out.mjs",
-    "build-parsers": "crane lib/grammar.crane -r e > lib/expression-parser.mjs && crane lib/grammar.crane -r module > lib/module-parser.mjs"
+    "repl": "node --experimental-modules test/repl.js"
   },
   "bin": {
-    "defscript": "./bin/defscript.js"
+    "defscript": "command.js"
   },
   "repository": {
     "type": "git",
@@ -33,12 +31,10 @@
   "homepage": "https://github.com/gabrielratener/defscript#readme",
   "dependencies": {
     "commander": "^2.18.0",
-    "crane-parser": "^0.1.7",
-    "estemplate": "^0.5.1",
-    "lexie": "^1.0.5"
+    "defscript-core": "0.0.3"
   },
   "devDependencies": {
-    "chalk": "^2.4.1",
+    "chalk": "^2.4.2",
     "livescript": "^1.5.0"
   }
 }

@@ -4,7 +4,7 @@ const fs = require('fs');
 const chalk = require('chalk');
 
 (async () => {
-    const {tokenize, parse, compileToAST, compile, getParser} = await import('../lib');
+    const {tokenize, parse, compileToAST, compile} = await import('../');
 
     const failSymbol = chalk.red('\u2718');
     const winSymbol = chalk.green('\u2714');

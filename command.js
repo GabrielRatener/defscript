@@ -7,7 +7,7 @@ const mod = require('module');
 const commander = require('commander');
 const package = require('../package.json');
 
-import('../lib')
+import('../')
 	.then(({parse, compile, compileToAST, tokenize}) => {
 		commander
 			.version(package.version, '-v, --version')
