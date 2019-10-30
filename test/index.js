@@ -1,7 +1,9 @@
 
-const vm = require('vm');
-const fs = require('fs');
-const chalk = require('chalk');
+import vm from "vm"
+import fs from "fs"
+import chalk from "chalk"
+
+const hereDir = `${process.cwd()}/test`;
 
 (async () => {
     const {tokenize, parse, compileToAST, compile} = await import('../');
@@ -17,11 +19,11 @@ const chalk = require('chalk');
         const tegex = /^##test:(.*)$/;
         const files =
           fs
-            .readdirSync(`${__dirname}/suite`)
+            .readdirSync(`${hereDir}/suite`)
             .filter(name => name.endsWith('.dfs'))
         
         for (const file of files) {
-            const source = fs.readFileSync(`${__dirname}/suite/${file}`, 'utf8');
+            const source = fs.readFileSync(`${hereDir}/suite/${file}`, 'utf8');
             let testCase = null;
             
             for (const line of source.split('\n')) {

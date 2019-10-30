@@ -1,15 +1,15 @@
 {
   "name": "defscript",
   "type": "module",
-  "version": "0.0.7",
+  "version": "0.0.9",
   "description": "A simple, solid compile-to-js language with a extension API",
   "main": "index.mjs",
   "directories": {
     "lib": "lib"
   },
   "scripts": {
-    "test": "node --experimental-modules test/index.js",
-    "repl": "node --experimental-modules test/repl.js"
+    "test": "node --experimental-modules --es-module-specifier-resolution=node test/index.js",
+    "repl": "node --experimental-modules --es-module-specifier-resolution=node test/repl.js"
   },
   "bin": {
     "defscript": "command.js"
@@ -31,7 +31,9 @@
   "homepage": "https://github.com/gabrielratener/defscript#readme",
   "dependencies": {
     "commander": "^2.18.0",
-    "defscript-core": "^0.0.7"
+    "defscript-core": "^0.0.9",
+    "defscript-embedded-react": "^0.1.1",
+    "rollup-plugin-defscript": "^0.1.0"
   },
   "devDependencies": {
     "chalk": "^2.4.2",

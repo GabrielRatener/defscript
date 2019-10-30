@@ -1,20 +1,21 @@
-#!/usr/bin/env node --experimental-modules
+#!/usr/bin/env node --experimental-modules --experimental-json-modules --es-module-specifier-resolution=node
+ 
+import vm from "vm"
+import fs from "fs"
+import path from "path"
+import mod from "module"
+import commander from "commander"
+import pkg from "./package.json"
 
-const vm = require('vm');
-const fs = require('fs');
-const path = require('path');
-const mod = require('module');
-const commander = require('commander');
-const package = require('../package.json');
-
-import('../')
+import('./index')
 	.then(({parse, compile, compileToAST, tokenize}) => {
 		commander
-			.version(package.version, '-v, --version')
+			.version(pkg.version, '-v, --version')
 			.option('-e, --execute', 'Execute defscript file')
 			.option('-a, --ast <ast>', 'Output "JS" or "DFS" AST', /^(js|dfs)$/i)
 			.option('-t, --tokenize', 'Tokenize file with rewriter')
 			.option('-T, --tokenize-raw', 'Tokenize file without rewriter')
+			.option('-b, --bundle', 'Tokenize file without rewriter')
 			.action((file, opts) => {
 
 				const getSource = () => {
