@@ -29,6 +29,25 @@
 
   :eq a 13
 
+##test: Return Sugar
+
+  def add(numbs) {
+    <|
+    :numbs.reduce (sum, val) {
+
+      sum + val
+      |>
+    } 0
+  }
+
+  a = :add *
+    5
+    4
+    5
+
+  :eq a 14
+
+
 ##test: Combined Sugar
 
   def add(numbs) {

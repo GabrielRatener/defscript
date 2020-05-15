@@ -671,8 +671,10 @@ statement
 
     control-flow-statement
         return-statement
-            > \return       => new @node.ReturnStatement argument: null
-            > \return e     => new @node.ReturnStatement argument: $[1]
+            > \return           => new @node.ReturnStatement argument: null
+            > \return e         => new @node.ReturnStatement argument: $[1]
+            > \left-return e    => new @node.ReturnStatement argument: $[1]
+            > e \right-return   => new @node.ReturnStatement argument: $[0]
 
         yield-statement
             > \yield =>
