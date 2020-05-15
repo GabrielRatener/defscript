@@ -4,6 +4,9 @@
   "version": "0.1.7",
   "description": "A simple, solid compile-to-js language with a extension API",
   "main": "./lib/index.js",
+  "bin": {
+    "defscript": "./bin/defscript.js"
+  },
   "directories": {
     "lib": "lib"
   },
