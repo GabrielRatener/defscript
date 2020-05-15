@@ -4,6 +4,7 @@ import jolt from "jolt.sh"
 const {$} = jolt;
 
 const generateParser = (file, type = 'module') => {
+
   if (!['module', 'expression'].includes(type)) {
 
     throw new Error(`Invalid parser type "${type}"`);
@@ -33,6 +34,7 @@ const test = async () => {
 }
 
 const postinstall = () => {
+  // for now do nothing...
   // crane();
 }
 
