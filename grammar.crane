@@ -33,7 +33,7 @@ string
 
     single
         > \simple-string    => @literal @escapade $[0]
-
+        > \easy-string      => @literal $[0].slice 1
 
     double
         component

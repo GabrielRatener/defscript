@@ -47,3 +47,8 @@
 
     eq(b, 'hey babys')
     eq(c, 'hey babys baby')
+
+##test: Easy strings
+    
+    eq(\eeezie, "eeezie")
+    eq(\div#app.glowing, 'div#app.glowing')
