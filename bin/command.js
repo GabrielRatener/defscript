@@ -1,20 +1,20 @@
 #!/usr/bin/env node
  
-import vm from "vm"
 import fs from "fs"
 import path from "path"
 import url from "url"
-import mod from "module"
 import commander from "commander"
+import jolt from "jolt.sh"
 
 const here = path.dirname(url.fileURLToPath(import.meta.url));
 const pkg = JSON.parse(fs.readFileSync(`${here}/../package.json`));
+const {$} = jolt;
 
 import('../lib/index.js')
   .then(({parse, compile, compileToAST, tokenize}) => {
-		commander.program
-			.command('defscript <file>')
-			.description("The one and only DefScript command")
+    commander.program
+      .command('defscript <file>')
+      .description("The one and only DefScript command")
       .version(`DefScript v${pkg.version}`, '-v, --version')
       .option('-e, --execute', 'Execute defscript file')
       .option('-a, --ast <ast>', 'Output "JS" or "DFS" AST', /^(js|dfs)$/i)
@@ -31,18 +31,11 @@ import('../lib/index.js')
         }
 
         if (opts.execute) {
-          const source = getSource();
-          const output = compile(source);
-          const fn = vm.runInThisContext(mod.wrap(output));
-          const module = {exports: {}};
-          const filename = path.join(process.cwd(), file);
-          const dirname = path.dirname(filename);
-          
-          function injectedRequire(dest) {
-            return require(path.join(dirname, dest));
-          }
 
-          fn(module.exports, injectedRequire, module, filename, dirname);
+          const resolverPath =
+            path.resolve(`${here}/../resolvers/node.js`);
+
+          $`/usr/bin/env node  --experimental-loader ${resolverPath} ${file}`;
 
           return;
         }
