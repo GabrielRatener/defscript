@@ -25,6 +25,24 @@
     return a + b
   }
 
-  a = crazy` 6 7
+  a = :crazy 6 7
 
-  eq` a 13
+  :eq a 13
+
+##test: Combined Sugar
+
+  def add(numbs) {
+
+    return :numbs.reduce (sum, val) {
+
+      return sum + val
+    } 0
+  }
+
+  a = :add *
+    3
+    4
+    5
+
+  :eq a 12
+  

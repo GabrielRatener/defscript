@@ -217,9 +217,9 @@ e
                 > lite-args argument        => [...$[0], $[1]]
 
             # call expression
-            > e '`' lite-args =>
+            > \call e lite-args =>
                 new @node.CallExpression do
-                    callee: $[0]
+                    callee: $[1]
                     arguments: $[2]
 
         > traditional
@@ -231,7 +231,7 @@ e
     > e 'pow' e         => @binaryExpression($)
     > e 'and' e         => @binaryExpression($)
     > e 'or' e          => @binaryExpression($)
-    > \linear e         => @unaryExpression($)
+    > \unilinear e      => @unaryExpression($)
     > \! e              => @unaryExpression($)
     > \not e            => @unaryExpression($)
     > '(' e ')'         => $[1]
