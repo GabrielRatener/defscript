@@ -1,7 +1,7 @@
 {
   "name": "defscript",
   "type": "module",
-  "version": "0.2.4",
+  "version": "0.2.6",
   "description": "A simple, solid compile-to-js language with a extension API",
   "main": "./lib/index.js",
   "bin": {
