@@ -33,7 +33,7 @@ const test = async () => {
 }
 
 const postinstall = () => {
-  crane();
+  // crane();
 }
 
 const main = (script, args = []) => {
