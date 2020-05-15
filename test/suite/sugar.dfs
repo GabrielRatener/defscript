@@ -25,43 +25,43 @@
     return a + b
   }
 
-  a = :crazy 6 7
+  a = crazy! 6 7
 
-  :eq a 13
+  eq! a 13
 
 ##test: Return Sugar
 
   def add(numbs) {
-    <|
-    :numbs.reduce (sum, val) {
+    |<
+    numbs.reduce! (sum, val) {
 
       sum + val
-      |>
+      >|
     } 0
   }
 
-  a = :add *
+  a = add! *
     5
     4
     5
 
-  :eq a 14
+  eq! a 14
 
 
 ##test: Combined Sugar
 
   def add(numbs) {
 
-    return :numbs.reduce (sum, val) {
+    return numbs.reduce! (sum, val) {
 
       return sum + val
     } 0
   }
 
-  a = :add *
+  a = add! *
     3
     4
     5
 
-  :eq a 12
+  eq! a 12
   

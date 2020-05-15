@@ -60,12 +60,19 @@ import('../lib/index.js')
 
         if (opts.tokenize) {
           for (const token of tokenize(getSource())) {
-            const string =
-              token.source
+
+            if (token.value === null) {
+
+              console.log(`${token.type} <pseudo>`);
+            } else {
+
+              const string =
+                token.source
                 .slice(...token.range)
                 .replace(/\n/g, '\\n')
                 .replace(/\t/g, '\\t');
-            console.log(token.type, ':', `"${string}"`);
+              console.log(token.type, ':', `"${string}"`);
+            }
           }
 
           return;

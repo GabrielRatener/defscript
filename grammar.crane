@@ -4,8 +4,9 @@
 %left \linear
 %left \scalar
 %right \pow
+%none '[' ']'
 %none '!'
-%none '{' '(' '[' ']' ')' '}' '.'
+%none '{' '(' ')' '}' '.'
 
 module
     module-line
@@ -211,15 +212,14 @@ e
 
         lite
             lite-args
-            
-                > argument                  => [$[0]]
+                > ''                        => []
                 > lite-args ',' argument    => [...$[0], $[2]]
                 > lite-args argument        => [...$[0], $[1]]
 
             # call expression
-            > \call e lite-args =>
+            > e '!' lite-args =>
                 new @node.CallExpression do
-                    callee: $[1]
+                    callee: $[0]
                     arguments: $[2]
 
         > traditional
