@@ -161,9 +161,9 @@
 
 	def sleepABunch() ~ {
 		i += 2
-		await sleep(500)
+		await sleep(50)
 		i += 5
-		await sleep(200)
+		await sleep(20)
 		i += 3
 	}
 
@@ -190,7 +190,7 @@
 	}
 
 	def doTest() ~ {
-		def ag = sleepABunch(4, 100)
+		def ag = sleepABunch(4, 20)
 		def ai = ag[Symbol.asyncIterator]()
 
 		while true do
@@ -201,7 +201,7 @@
 			else
 				list.push(ctrl.value)
 
-		arrayEq(list, [0, 100, 200, 300])
+		arrayEq(list, [0, 20, 40, 60])
 	}
 
 	async(doTest())

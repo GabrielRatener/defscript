@@ -9,7 +9,7 @@
     
     eq(c, 2)
 
-    if b != c do
+    if b != c and b != c do
         c = 99
     else
         c = 66
@@ -77,6 +77,37 @@
     })
 
     eq(m, 'yuck')
+
+##test: Break/continue statements
+    def i := 0
+    def a := 3
+
+    while true do
+        def val = i
+
+        if i > 20 do
+            break
+
+        i += 1
+
+        if val % 2 == 0 do
+            continue
+
+        a = val ^ 2
+
+    eq(i, 21)
+    eq(a, 361)
+
+##test: Throw statement
+    def i := 0
+    def a := 3
+
+    try
+        throw new Error('error')
+    catch e do
+        a = 5
+
+    eq(a, 5)
 
 ##test: Async iteration
     def iterate = {

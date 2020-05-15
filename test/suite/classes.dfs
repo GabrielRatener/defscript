@@ -158,7 +158,7 @@
         }
     }
 
-    def class Ferrari : Car {
+    def class Ferrari < Car {
         constructor() {
             super()
 

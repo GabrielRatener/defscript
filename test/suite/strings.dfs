@@ -1,0 +1,49 @@
+
+##test: Basic single-quoted strings
+    def a = 'ass'
+    def b = 'hole'
+    def c = 'asshole'
+
+    eq(a + b, c)
+    eq(b.length, 4)
+
+##test: Escaped single-quoted strings
+    def a = 'ass'
+    def b = '\nhole'
+    def c = a + b
+
+    eq(c.length, 8)
+    eq(c[3].charCodeAt(), 10)
+
+##test: Plain double-quoted strings
+    def a = "hello"
+    def b = "bitch"
+
+    eq(a + b, "hellobitch")
+
+##test: Escaped double-quoted strings
+    def a = "hello"
+    def b = "\nbitch"
+    def c = a + b
+
+    eq(c[5].charCodeAt(), 10)
+    eq(c.length, 11)
+    eq(c, "hello\nbitch")
+
+##test: Interpolated double-quoted strings
+    def a = "baby"
+    def b = "hey {a}"
+    def c = "a\n{b}a\n"
+
+    eq(b.length, 8)
+    eq(c.length, 12)
+    eq(c[1].charCodeAt(), 10)
+    eq(c.slice(2, 10), 'hey baby')
+
+##test: Nested double-quoted strings
+    def a = "baby"
+    def b = "hey {a + "s"}"
+    def c = "hey {a + "s {a}"}"
+
+    eq(b, 'hey babys')
+    eq(c, 'hey babys baby')

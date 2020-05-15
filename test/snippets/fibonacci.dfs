@@ -1,11 +1,15 @@
 
-def fibonacci(n) {
+def fibonacci(n) -> {
     if n < 2 do
         return n
     else
         return fibonacci(n - 1) + fibonacci(n - 2)
 }
 
-        
+def hello = #endlang he ya wassap
 
-console.log(fibonacci(8))
+def hola = #otherend
+    some other stuff
+    some more stuff
+
+def yuck = 8

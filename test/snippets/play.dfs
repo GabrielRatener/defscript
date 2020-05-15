@@ -1,0 +1,21 @@
+
+export def class IterationSudoku : Sudoku {
+    constructor(parent) {
+        @parent = parent
+        @discoveries = new Map()
+    }
+
+    get(index) {
+        if @discoveries.has(index) do
+            return @discoveries.get(index)
+        else
+            return @parent.get(index)
+    }
+
+    set(index, val) {
+        if @get(index) == 0 and 0 < val <= 9 do
+            @discoveries.set(index, val)
+        else
+            throw new Error("Invalid value {val}")
+    }
+}

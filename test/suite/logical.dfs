@@ -1,0 +1,9 @@
+
+##test: Negation precedence
+    eq(not 0 + 3, false)
+    eq(!0 + 3, 4)
+
+##test: And/or
+    eq(false and true, false)
+    eq(false or true, true)
+    eq(true and true, true)

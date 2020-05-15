@@ -1,0 +1,47 @@
+
+##test: Embedded Single-line
+    def thing = #math 2 * 4
+
+    eq(thing, 2 * 4)
+
+##test: Embedded Multi-line
+    def a = #math
+        2 * 5
+
+    eq(a, 10)
+
+##test: Embedded with interpolated Defscript
+    def obj = {
+        multiplier: 3
+        
+        val() -> {
+            return #math
+                2 * {@multiplier}
+        }
+
+        valToo() {
+            return #math
+                4 + {@val()}
+        }
+    }
+
+    eq(obj.val(), 6)
+    eq(obj.valToo(), 10)
+
+##test: Embedded with nested interpolations
+    def obj = {
+        adder: 3
+        
+        val() -> {
+            return #math
+                2 + {@adder}
+        }
+
+        valToo() {
+            return #math
+                4 + {@val() + "a{@val()}"}
+        }
+    }
+
+    eq(obj.val(), 5)
+    eq(obj.valToo(), "45a5")

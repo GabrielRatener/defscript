@@ -1,18 +1,19 @@
 {
   "name": "defscript",
   "type": "module",
-  "version": "0.0.9",
+  "version": "0.1.4",
   "description": "A simple, solid compile-to-js language with a extension API",
-  "main": "index.mjs",
+  "main": "./lib/index.js",
   "directories": {
     "lib": "lib"
   },
   "scripts": {
-    "test": "node --experimental-modules --es-module-specifier-resolution=node test/index.js",
-    "repl": "node --experimental-modules --es-module-specifier-resolution=node test/repl.js"
-  },
-  "bin": {
-    "defscript": "command.js"
+    "start": "node start.js",
+    "test": "npm start test",
+    "test-light": "npm start test-light",
+    "repl": "npm start repl",
+    "postinstall": "npm start postinstall",
+    "build-parser": "npm start parsers"
   },
   "repository": {
     "type": "git",
@@ -26,17 +27,20 @@
   "author": "Gabriel Ratener",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/gabrielratener/defscript/issues"
+    "url": "https://github.com/defscript/defscript/issues"
   },
-  "homepage": "https://github.com/gabrielratener/defscript#readme",
+  "homepage": "https://github.com/defscript/defscript#readme",
   "dependencies": {
-    "commander": "^2.18.0",
-    "defscript-core": "^0.0.9",
-    "defscript-embedded-react": "^0.1.1",
-    "rollup-plugin-defscript": "^0.1.0"
+    "commander": "^5.1.0",
+    "crane-parser": "^0.2.1",
+    "esm": "^3.2.25",
+    "estemplate": "^0.5.1",
+    "jolt.sh": "^1.0.2",
+    "lexie": "1.0.6"
   },
   "devDependencies": {
-    "chalk": "^2.4.2",
+    "chalk": "^2.4.1",
+    "eslint": "^7.0.0",
     "livescript": "^1.5.0"
   }
 }

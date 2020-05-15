@@ -1,0 +1,30 @@
+
+##test: Array Sugar
+
+  a = *
+    1
+    5
+    88
+
+  eq(a[0], 1)
+  eq(a[2], 88)
+
+##test: Object Sugar
+
+  o = **
+    abs: 6
+    butflaps: 2
+
+  eq(o.abs, 6)
+  eq(o.butflaps, 2)
+
+##test: Call Expression Sugar
+
+  def crazy(a, b) {
+
+    return a + b
+  }
+
+  a = crazy` 6 7
+
+  eq` a 13
