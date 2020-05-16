@@ -36,6 +36,7 @@
   "dependencies": {
     "commander": "^5.1.0",
     "crane-parser": "^0.2.1",
+    "escodegen": "^1.14.1",
     "esm": "^3.2.25",
     "estemplate": "^0.5.1",
     "jolt.sh": "^1.0.2",

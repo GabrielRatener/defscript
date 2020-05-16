@@ -271,6 +271,16 @@ const __dirname = path.dirname(__filename);
     }
   }
 
+  const testFn = (fn) => {
+    return () => {
+      try {
+        return fn();
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  }
+
   const tabulate = (title, tests, details = [], message = '') => {
     const explicitPad = {
       'run': 7
@@ -333,14 +343,14 @@ const __dirname = path.dirname(__filename);
   for (const {title, file, code, run} of getTests()) {
     const results = preliminaryTitles.reduce((obj, key) => (obj[key] = false, obj), {});
     const tests = [
-      () => {
+      testFn(() => {
         for (const token of tokenize(code)) {
           // console.log(token.type, token.value, token.range);
         }
-      },
-      () => parse(code, {type: 'module'}),
-      () => compileToAST(code, {type: 'module', embedded}),
-      () => {
+      }),
+      testFn(() => parse(code, {type: 'module'})),
+      testFn(() => compileToAST(code, {type: 'module', embedded})),
+      testFn(() => {
         const generated = compile(code, {
           type: 'module',
           embedded,
@@ -354,7 +364,7 @@ const __dirname = path.dirname(__filename);
         if (!generated.map || !generated.code) {
           throw new Error("Bad source map settings");
         }
-      }
+      })
     ]
 
     let error = null, index = 0;

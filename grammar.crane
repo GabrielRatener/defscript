@@ -234,6 +234,7 @@ e
     > \unilinear e      => @unaryExpression($)
     > \! e              => @unaryExpression($)
     > \not e            => @unaryExpression($)
+    > e '?'             => @unaryExpression($, no)
     > '(' e ')'         => $[1]
     > function          => new @node.FunctionExpression($[0])
     > class.expression

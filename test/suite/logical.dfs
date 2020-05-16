@@ -7,3 +7,13 @@
     eq(false and true, false)
     eq(false or true, true)
     eq(true and true, true)
+
+##test: Non-null operator
+
+    def a = false
+    def b = null
+    def c = undefined
+
+    eq(a?, true)
+    eq(b?, false)
+    eq(c?, false)

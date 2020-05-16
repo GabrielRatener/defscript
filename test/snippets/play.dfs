@@ -1,5 +1,5 @@
 
-export def class IterationSudoku : Sudoku {
+export def class IterationSudoku < Sudoku {
     constructor(parent) {
         @parent = parent
         @discoveries = new Map()
