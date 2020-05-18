@@ -4,6 +4,7 @@
 %left \linear
 %left \scalar
 %right \pow
+%right '?'
 %none '[' ']'
 %none '!'
 %none '{' '(' ')' '}' '.'
@@ -69,6 +70,14 @@ member-access
             object: $[0]
             property: $[2]
             computed: false
+            safe: false
+
+    > e '?' '.' identifier =>
+        new @node.MemberExpression do
+            object: $[0]
+            property: $[3]
+            computed: false
+            safe: true
 
     # used for cascade statements only
     > obj \. identifier  =>
@@ -76,18 +85,28 @@ member-access
             object: $[0]
             property: $[2]
             computed: false
+            safe: false
 
     > \this identifier  =>
         new @node.MemberExpression do
             object: new @node.ThisExpression({loc: null})
             property: $[1]
             computed: false
+            safe: false
 
     > e '[' e ']'  =>
         new @node.MemberExpression do
             object: $[0]
             property: $[2]
             computed: true
+            safe: false
+
+    > e '?' '[' identifier ']' =>
+        new @node.MemberExpression do
+            object: $[0]
+            property: $[3]
+            computed: true
+            safe: true
 
 e
     splat
@@ -197,18 +216,26 @@ e
                 new @node.CallExpression do
                     callee: $[0]
                     arguments: $[2]
-
+                    safe: false
+            
+            > e '?' '(' arguments ')'   =>
+                new @node.CallExpression do
+                    callee: $[0]
+                    arguments: $[3]
+                    safe: true
 
         constructor
             > \new identifier '(' arguments ')' =>
                 new @node.NewExpression do
                     callee: $[1]
                     arguments: $[3]
+                    safe: false
 
             > \new member-access '(' arguments ')' =>
                 new @node.NewExpression do
                     callee: $[1]
                     arguments: $[3]
+                    safe: false
 
         lite
             lite-args
@@ -221,6 +248,14 @@ e
                 new @node.CallExpression do
                     callee: $[0]
                     arguments: $[2]
+                    safe: false
+
+            > e '?' '!' lite-args =>
+                new @node.CallExpression do
+                    callee: $[0]
+                    arguments: $[3]
+                    safe: true
+
 
         > traditional
         > constructor

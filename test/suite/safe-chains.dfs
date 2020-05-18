@@ -1,0 +1,20 @@
+
+##test: Basic Safe member-access
+
+  def obj = null
+
+  eq(obj?.hello, undefined)
+  eq(obj?.hello.other, undefined)
+
+##test: Basic Safe function-call
+  def func = null
+
+  eq(func?(), undefined)
+  eq(func?!, undefined)
+
+
+##test: Combined chains
+  def func = null
+
+  eq(func?().glass.boat?.truck, undefined)
+  eq(func?!.glass, undefined)
