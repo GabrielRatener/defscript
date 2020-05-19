@@ -304,3 +304,22 @@
 
 	eq(fn(5), 8)
 	eq(fnn(4, 7), 11)
+
+##test: Piping
+
+	def add(a, b) {
+		a + b >|
+	}
+
+	def badd(a, b) {
+		add(a, b)
+		|> add! 2 _
+		|> add! 3 _
+		>|
+	}
+
+	def a = add(2, 3) |> add! 5 _
+	def b = badd! 3 4
+
+	eq(a, 10)
+	eq(b, 12)

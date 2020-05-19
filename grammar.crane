@@ -1,4 +1,5 @@
 %none \not
+%left \pipe-left \pipe-right
 %left 'and' 'or'
 %left \compare
 %left \linear
@@ -262,6 +263,20 @@ e
         > constructor
         > lite
 
+    pipe-expression
+
+        > e \pipe-left e    =>
+            new @node.PipeExpression do
+                input: $[2]
+                consumer: $[0]
+                left: true
+
+        > e \pipe-right e   =>
+            new @node.PipeExpression do
+                input: $[0]
+                consumer: $[2]
+                left: false
+
     > e \scalar e       => @binaryExpression($)
     > e \linear e       => @binaryExpression($)
     > e 'pow' e         => @binaryExpression($)
@@ -283,6 +298,7 @@ e
     > compare-chain
     > call-expression
     > embedded-expression
+    > pipe-expression
 
     > \await e =>
         new @node.AwaitExpression do
