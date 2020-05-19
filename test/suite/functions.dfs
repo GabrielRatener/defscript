@@ -292,3 +292,15 @@
 
 	arrayEq(Array.from(obj2.get3()), [4, 8, 12])
 	arrayEq(Array.from(obj2.get2()), [4, 8])
+
+##test: Placeholders
+
+	def add(a, b) {
+		a + b >|
+	}
+
+	fn = add! 3 _
+	fnn = add! _ _
+
+	eq(fn(5), 8)
+	eq(fnn(4, 7), 11)
